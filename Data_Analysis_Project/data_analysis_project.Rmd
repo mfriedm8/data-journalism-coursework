@@ -1,0 +1,95 @@
+---
+title: "Data_Analysis_project"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+#For my data analysis project, I am choosing to focus on opioid death rates in the State of Maryland and attempt to figure out why they are so high. We have been talking about opioid death rates as it relates to income in class and have found generally that the poorer states have the higher opioid death rates. However, Maryland is the richest state in the union by median household income. I would like to figure out what accounts for this dissonance.
+
+```
+
+```{r}
+
+library(arcos)
+library(tidyverse)
+library(janitor)
+library(tidycensus)
+library(scales)
+
+```
+
+```{r}
+
+key <- "uO4EK6I"
+
+```
+
+```{r}
+
+#1 The Maryland county pills per year
+
+maryland_county_pills_per_year <- summarized_county_annual(key = key) %>%
+  clean_names() %>%
+   select(buyer_state, buyer_county, year, dosage_unit) %>%
+  filter(buyer_state == "MD")
+
+```
+
+```{r}
+
+#2 Maryland county population per year 
+
+maryland_county_population_per_year <- county_population(key = key) %>%
+  clean_names() %>%
+   select(buyer_state, buyer_county, year, population) %>%
+  filter(buyer_state == "MD")
+
+```
+
+```{r}
+
+maryland_pills_population <- maryland_county_pills_per_year %>%
+  inner_join(maryland_county_population_per_year, by="buyer_county")
+
+```
+
+```{r}
+#3 Loading the census data
+
+census_api_key("549950d36c22ff16455fe196bbbd01d63cfbe6cf", install = TRUE, overwrite = TRUE)
+
+```
+
+```{r}
+
+#4 Finding the county income data 
+
+maryland_county_income <- get_acs(geography = "county", variables = c(medincome = "B19013_001"), state = "MD", key=key)
+
+```
+
+```{r}
+
+#5 Finding the state income data for all states 
+
+all_state_incomes <- get_acs(geography = "state", year = "2010", variables = "B19013_001")
+
+```
+
+```{r}
+
+#6 Finding the margin of errors in census data 
+
+moe_sum(moe, estimate = NULL, na.rm = FALSE)
+
+```
+
+```{r}
+
+
+
