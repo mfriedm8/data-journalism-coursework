@@ -31,35 +31,45 @@ key <- "uO4EK6I"
 
 ```{r}
 
-#1 The Maryland county pills per year
+#1 What county in Maryland had the most pills shipped per year?
 
 maryland_county_pills_per_year <- summarized_county_annual(key = key) %>%
   clean_names() %>%
-   select(buyer_state, buyer_county, year, dosage_unit) %>%
+   select(buyer_state, buyer_county, year, dosage_unit, countyfips) %>%
   filter(buyer_state == "MD")
 
 ```
 
 ```{r}
 
-#2 Maryland county population per year 
+#2 What Maryland county was most populous from 2006-2012?
 
 maryland_county_population_per_year <- county_population(key = key) %>%
   clean_names() %>%
-   select(buyer_state, buyer_county, year, population) %>%
+   select(buyer_state, buyer_county, year, population, countyfips) %>%
   filter(buyer_state == "MD")
 
 ```
 
 ```{r}
+#3 What county in Maryland had the most pills person from 2006-2012?
 
-maryland_pills_population <- maryland_county_pills_per_year %>%
-  inner_join(maryland_county_population_per_year, by="buyer_county")
+pills_population <- maryland_county_pills_per_year %>%
+  inner_join(maryland_county_population_per_year, by="countyfips")
 
 ```
 
 ```{r}
-#3 Loading the census data
+
+maryland_pills_population <- pills_population %>%
+  select(countyfips, buyer_county.x, buyer_state.x, population, dosage_unit) %>%
+  rename(buyer_county = buyer_county.x, buyer_state = buyer_state.x)
+
+
+```
+
+```{r}
+#4 Loading the census data
 
 census_api_key("549950d36c22ff16455fe196bbbd01d63cfbe6cf", install = TRUE, overwrite = TRUE)
 
@@ -67,23 +77,23 @@ census_api_key("549950d36c22ff16455fe196bbbd01d63cfbe6cf", install = TRUE, overw
 
 ```{r}
 
-#4 Finding the county income data 
+#5 Finding the county income data 
 
-maryland_county_income <- get_acs(geography = "county", variables = c(medincome = "B19013_001"), state = "MD", key=key)
-
-```
-
-```{r}
-
-#5 Finding the state income data for all states 
-
-all_state_incomes <- get_acs(geography = "state", year = "2010", variables = "B19013_001")
+maryland_county_income <- get_acs(geography = "county",  variables = c(medincome = "B19013_001"), state = "MD", key=key)
 
 ```
 
 ```{r}
 
-#6 Finding the margin of errors in census data 
+#6 Finding the state income data for all states 
+
+all_state_incomes <- get_acs(geography = "state", variables = "B19013_001")
+
+```
+
+```{r}
+
+#7 Finding the margin of errors in census data 
 
 moe_sum(moe, estimate = NULL, na.rm = FALSE)
 
@@ -91,5 +101,60 @@ moe_sum(moe, estimate = NULL, na.rm = FALSE)
 
 ```{r}
 
+#8 
 
+maryland_county_income_subdivisions <- get_acs(geography = "county subdivision", variables = c(medincome = "B19013_001"), state = "MD", key=key)
 
+```
+
+```{r}
+#9 What are the richest and poorest districts in Baltimore County?
+
+#Dundalk in District 12 and Monkton/Phoenix in District 10 are the poorest and richest districts in Baltimore County based on median household income, according to the census data 
+
+#10 What are the richest and poorest districts in Montgomery County?
+
+#Gaithersburg/Germantown/Montgomery District and Potomac are the poorest and richets districts in Montogomery County based on median household income, according to the census data 
+
+#11 What district in West Virginia, the poorest state, compares to a district in Maryland?
+
+wv_county_pills_per_year <- summarized_county_annual(key = key) %>%
+  clean_names() %>%
+   select(buyer_state, buyer_county, year, dosage_unit, countyfips) %>%
+  filter(buyer_state == "WV")
+
+wv_county_population_per_year <- county_population(key = key) %>%
+  clean_names() %>%
+   select(buyer_state, buyer_county, year, population, countyfips) %>%
+  filter(buyer_state == "WV")
+
+pills_population_wv <- wv_county_pills_per_year %>%
+  inner_join(wv_county_population_per_year, by="countyfips")
+
+wv_pills_population <- pills_population_wv %>%
+  select(countyfips, buyer_county.x, buyer_state.x, population, dosage_unit) %>%
+  rename(buyer_county = buyer_county.x, buyer_state = buyer_state.x)
+
+```
+
+```{r}
+
+#12 What pharmacies received the most pills in Baltimore County?
+
+baltimore_county_pharmacies <- total_pharmacies_county(county= "BALTIMORE", key = key)
+
+```
+
+```{r}
+
+#13 What distributors shipped the most pills to Baltimore County? 
+
+total_distributors_county(county= "BALTIMORE", key = key)
+
+```
+
+```{r}
+
+#14 and 15 Are there certain distributors that focus their pill distribution in the poorer areas of Maryland?
+
+#How does this relate to the rest of the country? I am unsure of how to answer these two questions currently, but I would like to answer them because I believe they may yield interesting answers. 
