@@ -158,3 +158,81 @@ total_distributors_county(county= "BALTIMORE", key = key)
 #14 and 15 Are there certain distributors that focus their pill distribution in the poorer areas of Maryland?
 
 #How does this relate to the rest of the country? I am unsure of how to answer these two questions currently, but I would like to answer them because I believe they may yield interesting answers. 
+
+```
+
+```{r}
+#Next I want to explore more of the makeup of the poor areas affected by the opioid crisis 
+
+#16 How many black people live in Baltimore County? 
+
+baltimore_county_black <- get_acs(geography = "county", variables = c("B02001_003"), year = 2012)
+
+#17 How many of those black people live in Dundalk (one of the poorer areas of the county I outlined)?
+
+dundalk_black <- get_acs(geography = "county subdivision", variables = c("B02001_003"), year = 2012, state="MD")
+
+
+#18 How many black people are in counties in West Virginia?
+
+West_Virginia_black <- get_acs(geography = "county", variables = c("B02001_003"), year = 2012, state="MD")
+
+#19 What is the racial makeup of states with a low number of pill shipments?
+
+All_states_black <- get_acs(geography = "state", variables = c("B02001_003"), year = 2012)
+
+```
+
+```{r}
+
+#I also want to look at how urban and rural areas compared in opioid usage in Maryland and in the country at large
+
+#20 How many pills were distributed to the rural counties of Maryland?
+
+maryland_rural_pills <- summarized_county_annual(key = key) %>%
+  clean_names() %>%
+   select(buyer_state, buyer_county, year, dosage_unit, countyfips) %>%
+  filter(buyer_state == "MD", buyer_county == "GARRETT, ALLEGANY, WASHINGTON, FREDERICK, CARROLL, HARFORD, CECIL, KENT, QUEEN ANNE'S, CAROLINE, TALBOT, DORCHESTER, WICOMICO, WORCESTER, SOMERSET, CHARLES, CALVERT, ST. MARY'S")
+
+#21 How many pills were distributed to majority urban/suburban counties in Maryland?
+
+maryland_urban_pills <- summarized_county_annual(key = key) %>%
+  clean_names() %>%
+   select(buyer_state, buyer_county, year, dosage_unit, countyfips) %>%
+  filter(buyer_state == "MD", buyer_county == "BALTIMORE, BALTIMORE CITY, MONTGOMERY, HOWARD, ANNE ARUNDEL, PRINCE GEORGE'S")
+
+```
+
+```{r}
+
+#22 What percentage of Maryland's population live in the urban/suburban areas?
+
+#23 What percentage of Maryland's population live in the rural areas?
+
+#This can be taken from the county population data set 
+
+```
+
+```{r}
+
+#24 How many pills were distributed to urban counties in West Virginia?
+
+wv_urban_pills <- summarized_county_annual(key = key) %>%
+  clean_names() %>%
+   select(buyer_state, buyer_county, year, dosage_unit, countyfips) %>%
+  filter(buyer_state == "WV", buyer_county == "BERKELEY, BROOKE, CABELL, HANCOCK, JEFFERSON, KANAWHA, MARSHALL, MINERAL, OHIO, PUTNAM, WAYNE, WOOD")
+
+#25 How many pills were distributed to rural counties in West Virginia?
+
+wv_rural_pills <- summarized_county_annual(key = key) %>%
+  clean_names() %>%
+   select(buyer_state, buyer_county, year, dosage_unit, countyfips) %>%
+  filter(buyer_state == "WV", buyer_county == "BERKELEY, BROOKE, CABELL, HANCOCK, JEFFERSON, KANAWHA, MARSHALL, MINERAL, OHIO, PUTNAM, WAYNE, WOOD")
+
+#26 What percentage of West Virginia's population live in the urban/suburban areas?
+
+#27 What percentage of West Virginia's population live in the rural areas?
+
+#This can be taken from the county population data set 
+
+```
