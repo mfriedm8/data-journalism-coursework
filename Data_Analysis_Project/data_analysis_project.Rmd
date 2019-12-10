@@ -189,17 +189,40 @@ All_states_black <- get_acs(geography = "state", variables = c("B02001_003"), ye
 
 #20 How many pills were distributed to the rural counties of Maryland?
 
-maryland_rural_pills <- summarized_county_annual(key = key) %>%
-  clean_names() %>%
-   select(buyer_state, buyer_county, year, dosage_unit, countyfips) %>%
-  filter(buyer_state == "MD", buyer_county == "GARRETT, ALLEGANY, WASHINGTON, FREDERICK, CARROLL, HARFORD, CECIL, KENT, QUEEN ANNE'S, CAROLINE, TALBOT, DORCHESTER, WICOMICO, WORCESTER, SOMERSET, CHARLES, CALVERT, ST. MARY'S")
+maryland_rural_pills <- maryland_county_pills_per_year %>%
+   select(buyer_state, buyer_county, year, dosage_unit, countyfips)%>%
+  filter(buyer_county %in% c("ALLEGANY", "WASHINGTON", "FREDERICK", "CARROLL", "HARFORD", "CECIL", "KENT", "QUEEN ANNES", "CAROLINE", "TALBOT", "DORCHESTER", "WICOMICO", "WORCESTER", "SOMERSET", "CHARLES", "CALVERT", "SAINT MARYS"))%>%
+  mutate(dosage_unit, total_pills = sum(dosage_unit)) 
+  
 
 #21 How many pills were distributed to majority urban/suburban counties in Maryland?
 
-maryland_urban_pills <- summarized_county_annual(key = key) %>%
+maryland_urban_pills <- maryland_county_pills_per_year %>%
   clean_names() %>%
    select(buyer_state, buyer_county, year, dosage_unit, countyfips) %>%
-  filter(buyer_state == "MD", buyer_county == "BALTIMORE, BALTIMORE CITY, MONTGOMERY, HOWARD, ANNE ARUNDEL, PRINCE GEORGE'S")
+  filter(buyer_county %in% c("BALTIMORE", "BALTIMORE CITY", "MONTGOMERY", "HOWARD", "ANNE ARUNDEL", "PRINCE GEORGES"))%>%
+  mutate(dosage_unit, total_pills =sum(dosage_unit))
+
+```
+
+```{r}
+maryland_urban_pills_population <- maryland_urban_pills %>%
+  inner_join(maryland_county_population_per_year, by="countyfips")%>%
+  select(buyer_state.x, buyer_county.x, dosage_unit, total_pills, year.y, population) %>%
+  mutate(population, total_population =sum(population))%>%
+  mutate(total_pills, pills_per_person =(total_pills/total_population))
+
+#Urban counties in Maryland acccount for 86 percent of Maryland's black population
+
+```
+
+```{r}
+
+maryland_rural_pills_population <- maryland_rural_pills %>%
+  inner_join(maryland_county_population_per_year, by="countyfips")%>%
+  select(buyer_state.x, buyer_county.x, dosage_unit, total_pills, year.y, population) %>%
+  mutate(population, total_population =sum(population))%>%
+  mutate(total_pills, pills_per_person =(total_pills/total_population))
 
 ```
 
@@ -217,22 +240,45 @@ maryland_urban_pills <- summarized_county_annual(key = key) %>%
 
 #24 How many pills were distributed to urban counties in West Virginia?
 
-wv_urban_pills <- summarized_county_annual(key = key) %>%
+wv_urban_pills <- wv_county_pills_per_year %>%
   clean_names() %>%
    select(buyer_state, buyer_county, year, dosage_unit, countyfips) %>%
-  filter(buyer_state == "WV", buyer_county == "BERKELEY, BROOKE, CABELL, HANCOCK, JEFFERSON, KANAWHA, MARSHALL, MINERAL, OHIO, PUTNAM, WAYNE, WOOD")
+  filter(buyer_county %in% c("BERKELEY", "BROOKE", "CABELL", "HANCOCK", "JEFFERSON", "KANAWHA", "MARSHALL", "MINERAL", "OHIO", "PUTNAM", "WAYNE", "WOOD"))%>%
+  mutate(dosage_unit, total_pills =sum(dosage_unit))
 
 #25 How many pills were distributed to rural counties in West Virginia?
 
-wv_rural_pills <- summarized_county_annual(key = key) %>%
+wv_rural_pills <- wv_county_pills_per_year %>%
   clean_names() %>%
    select(buyer_state, buyer_county, year, dosage_unit, countyfips) %>%
-  filter(buyer_state == "WV", buyer_county == "BERKELEY, BROOKE, CABELL, HANCOCK, JEFFERSON, KANAWHA, MARSHALL, MINERAL, OHIO, PUTNAM, WAYNE, WOOD")
+  filter(buyer_county %in% c("BARBOUR", "BOONE", "BRAXTON", "CALHOUN", "CLAY", "DODDRIDGE", "FAYETTE", "GILMER", "GRANT", "GREENBRIER", "HAMPSHIRE", "HARDY", "HARRISON", "JACKSON", "LEWIS", "LINCOLN", "LOGAN", "MARION", "MASON", "MCDOWELL", "MERCER", "MINGO", "MONONGALIA", "MONROE", "MORGAN", "NICHOLAS", "PENDLETON", "PLEASANTS", "POCAHONTAS", "PRESTON", "RALEIGH", "RANDOLPH", "RITCHIE", "ROANE", "SUMMERS", "TAYLOR", "TUCKER", "TYLER", "UPSHUR", "WEBSTER", "WETZEL", "WIRT", "WYOMING"))%>%
+  mutate(dosage_unit, total_pills =sum(dosage_unit))
 
 #26 What percentage of West Virginia's population live in the urban/suburban areas?
 
 #27 What percentage of West Virginia's population live in the rural areas?
 
 #This can be taken from the county population data set 
+
+```
+
+```{r}
+
+wv_urban_pills_population <- wv_urban_pills %>%
+  inner_join(wv_county_population_per_year, by="countyfips")%>%
+  select(buyer_state.x, buyer_county.x, dosage_unit, total_pills, year.y, population) %>%
+  mutate(population, total_population =sum(population))%>%
+  mutate(total_pills, pills_per_person =(total_pills/total_population))
+
+#WV's urban population accounts for 49.6 percent of the black population in the state. 
+
+```
+
+```{r}
+wv_rural_pills_population <- wv_rural_pills %>%
+  inner_join(wv_county_population_per_year, by="countyfips")%>%
+  select(buyer_state.x, buyer_county.x, dosage_unit, total_pills, year.y, population) %>%
+  mutate(population, total_population =sum(population))%>%
+  mutate(total_pills, pills_per_person =(total_pills/total_population))
 
 ```
